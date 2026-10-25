@@ -1,4 +1,4 @@
-# HandTrackingModule-Python — Gesture Volume Controller 🎛️✋
+# Gesture Volume Control 🎛️✋
 
 Control your Windows system volume using only your hand gestures and a webcam.
 
@@ -44,23 +44,38 @@ This project uses **OpenCV**, **MediaPipe**, and **Pycaw** to track your hand in
 Clone the repository:
 
 ```bash
-git clone https://github.com/mariospropapadimas-dev/HandTrackingModule-Python.git
-cd HandTrackingModule-Python
+git clone https://github.com/mariospapadimas/gesture-volume-control.git
+cd gesture-volume-control
 ```
 
 Install dependencies:
 
 ```bash
-pip install opencv-python mediapipe numpy pycaw comtypes
+python -m pip install "mediapipe==0.10.21" "numpy<2" "opencv-contrib-python<4.12" pycaw comtypes
 ```
+
+### Dependency compatibility
+
+Use a fresh virtual environment with 64-bit Python 3.11. The code uses MediaPipe's
+legacy `mediapipe.python.solutions` API, so the install command pins MediaPipe
+0.10.21 and compatible NumPy/OpenCV versions. `opencv-contrib-python` provides
+the `cv2` module and is also required by MediaPipe; do not install a second
+OpenCV wheel alongside it in the same environment. Migration to the newer
+[MediaPipe Tasks API](https://developers.google.com/mediapipe/solutions/vision/hand_landmarker)
+would require separate code changes.
+
+Tkinter is part of the Windows Python installer when Tcl/Tk is selected. Pycaw
+and comtypes are Windows-specific dependencies. This repository currently lists
+its dependencies in this README rather than a requirements or lock file.
 
 ## Project Structure
 
 ```
-HandTrackingModule-Python/
+gesture-volume-control/
 ├── main.py           # Entry point: captures webcam feed and drives volume control
 ├── hand_detector.py  # Reusable HandDetector class (MediaPipe hand landmarks, finger state, distance)
-└── README.md
+├── README.md
+└── LICENSE           # Existing Apache License 2.0
 ```
 
 `hand_detector.py` wraps MediaPipe's hand-tracking solution in a `HandDetector` class with helper
@@ -77,8 +92,9 @@ python main.py
 
 A dialog box will appear asking for a sensitivity multiplier:
 
-* Lower values = more sensitive volume changes
-* Higher values = smoother volume changes
+* The multiplier scales the measured finger distance before mapping it to volume.
+* A larger positive value reaches higher volume at a smaller finger spacing.
+* A smaller positive value maps the same spacing to a lower volume; it does not add smoothing.
 
 After selecting a value:
 
@@ -99,8 +115,9 @@ Press **ESC** to exit.
 ## Requirements
 
 * Windows 10/11
-* Python 3.9+
-* Webcam
+* 64-bit Python 3.11 (verified with 3.11.9), including Tcl/Tk
+* A working webcam with camera permission enabled for desktop applications
+* An available Windows audio output device
 
 ## Future Improvements
 
